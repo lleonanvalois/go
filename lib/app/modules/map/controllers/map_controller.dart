@@ -1,7 +1,7 @@
-import 'package:get/get.dart';
+import 'package:get/get.dart' hide Node;
 import 'package:latlong2/latlong.dart';
-import '../../data/providers/database_provider.dart';
-import '../../data/services/offline_routing_service.dart';
+import 'package:go/app/data/providers/database_provider.dart';
+import 'package:go/app/data/services/offline_routing_service.dart';
 
 class MapController extends GetxController {
   final double initialLat = -15.793889;

@@ -6,7 +6,7 @@ import '../modules/map/bindings/map_binding.dart';
 class AppPages {
   static final pages = [
     GetPage(
-      name: AppRoutes.MAP,
+      name: AppRoutes.map,
       page: () => const MapView(),
       binding: MapBinding(),
     ),

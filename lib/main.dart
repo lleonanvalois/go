@@ -7,7 +7,7 @@ void main() {
   runApp(
     GetMaterialApp(
       title: "go",
-      initialRoute: AppRoutes.MAP,
+      initialRoute: AppRoutes.map,
       getPages: AppPages.pages,
     ),
   );

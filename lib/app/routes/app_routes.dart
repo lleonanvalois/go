@@ -1,4 +1,4 @@
 abstract class AppRoutes {
-  static const MAP = '/map';
-  static const NAVIGATION = '/navigation';
+  static const map = '/map';
+  static const navigation = '/navigation';
 }
