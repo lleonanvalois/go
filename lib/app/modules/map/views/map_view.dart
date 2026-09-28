@@ -13,26 +13,27 @@ class MapView extends GetView<MapController> {
       appBar: AppBar(title: const Text('Go - Navegação Offline')),
       body: Stack(
         children: [
-          Obx(() => FlutterMap(
+          FlutterMap(
             options: MapOptions(
               initialCenter: LatLng(controller.initialLat, controller.initialLon),
-              initialZoom: 16.0, // Zoom próximo para enxergar as ruas simuladas
+              initialZoom: 16.0,
             ),
             children: [
               TileLayer(
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.go',
               ),
-              PolylineLayer(
+              Obx(() => PolylineLayer(
                 polylines: [
-                  Polyline(
-                    points: controller.routePoints.toList(),
-                    color: Colors.blueAccent,
-                    strokeWidth: 6.0,
-                  )
+                  if (controller.routePoints.isNotEmpty)
+                    Polyline(
+                      points: controller.routePoints.toList(),
+                      color: Colors.blueAccent,
+                      strokeWidth: 6.0,
+                    ),
                 ],
-              ),
-              MarkerLayer(
+              )),
+              Obx(() => MarkerLayer(
                 markers: controller.routePoints.map((point) => Marker(
                   point: point,
                   width: 15,
@@ -44,9 +45,9 @@ class MapView extends GetView<MapController> {
                     ),
                   ),
                 )).toList(),
-              )
+              )),
             ],
-          )),
+          ),
           Positioned(
             bottom: 20,
             right: 20,

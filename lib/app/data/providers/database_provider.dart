@@ -30,10 +30,15 @@ class DatabaseProvider {
         ''');
         
         await db.execute('''
-          CREATE VIRTUAL TABLE road_index USING rtree(
-            id, minX, maxX, minY, maxY
+          CREATE TABLE road_index (
+            id INTEGER PRIMARY KEY,
+            minX REAL,
+            maxX REAL,
+            minY REAL,
+            maxY REAL
           )
         ''');
+        await db.execute('CREATE INDEX IF NOT EXISTS idx_road_nodes_coords ON road_nodes (lat, lon);');
         
         // Inserir dados mock para teste do motor A*
         await _seedMockData(db);
