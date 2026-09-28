@@ -44,6 +44,7 @@ dependencies:
   wakelock_plus: ^1.8.0
   flutter_tts: ^4.2.5
   flutter_compass: ^0.8.1
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:
