@@ -23,9 +23,29 @@ class NavigationView extends GetView<NavigationController> {
           ),
           title: Text(
             isHud ? 'MODO HUD (PARA-BRISA)' : 'NAVEGAÇÃO',
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           actions: [
+            Obx(
+              () => IconButton(
+                icon: Icon(
+                  controller.isVoiceMuted.value
+                      ? Icons.volume_off
+                      : Icons.volume_up,
+                  color: controller.isVoiceMuted.value
+                      ? Colors.redAccent
+                      : Colors.white,
+                ),
+                tooltip: controller.isVoiceMuted.value
+                    ? 'Ativar Voz'
+                    : 'Desativar Voz',
+                onPressed: controller.toggleVoice,
+              ),
+            ),
             TextButton.icon(
               style: TextButton.styleFrom(
                 foregroundColor: isHud ? Colors.greenAccent : Colors.white,
@@ -67,7 +87,8 @@ class NavigationView extends GetView<NavigationController> {
             children: [
               FlutterMap(
                 options: MapOptions(
-                  initialCenter: controller.currentPosition.value ??
+                  initialCenter:
+                      controller.currentPosition.value ??
                       (controller.routePoints.isNotEmpty
                           ? controller.routePoints.first
                           : const LatLng(-15.793889, -47.882778)),
@@ -76,7 +97,8 @@ class NavigationView extends GetView<NavigationController> {
                 ),
                 children: [
                   TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                     userAgentPackageName: 'com.example.go',
                   ),
                   if (controller.routePoints.isNotEmpty)
@@ -97,7 +119,9 @@ class NavigationView extends GetView<NavigationController> {
                           width: 40,
                           height: 40,
                           child: Transform.rotate(
-                            angle: (controller.currentBearing.value * (math.pi / 180)),
+                            angle:
+                                (controller.currentBearing.value *
+                                (math.pi / 180)),
                             child: const Icon(
                               Icons.navigation,
                               color: Colors.cyanAccent,
@@ -111,11 +135,7 @@ class NavigationView extends GetView<NavigationController> {
               ),
 
               // Velocímetro flutuante sobre o mapa
-              Positioned(
-                bottom: 20,
-                left: 20,
-                child: _buildSpeedometerBadge(),
-              ),
+              Positioned(bottom: 20, left: 20, child: _buildSpeedometerBadge()),
             ],
           ),
         ),
@@ -196,7 +216,7 @@ class NavigationView extends GetView<NavigationController> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Colors.greenAccent.withOpacity(0.2),
+              color: Colors.greenAccent.withValues(alpha: 0.2),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -238,9 +258,12 @@ class NavigationView extends GetView<NavigationController> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.85),
+        color: Colors.black.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.cyanAccent.withOpacity(0.5), width: 2),
+        border: Border.all(
+          color: Colors.cyanAccent.withValues(alpha: 0.5),
+          width: 2,
+        ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
