@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:flutter_map/flutter_map.dart' hide MapController;
 import 'package:latlong2/latlong.dart';
+import 'package:go/app/routes/app_routes.dart';
 import '../controllers/map_controller.dart';
 
 class MapView extends GetView<MapController> {
@@ -48,14 +49,48 @@ class MapView extends GetView<MapController> {
               )),
             ],
           ),
+          // Botão flutuante para traçar rota
           Positioned(
             bottom: 20,
             right: 20,
             child: FloatingActionButton(
+              heroTag: 'calc_route_btn',
               onPressed: controller.calculateOfflineRoute,
               child: const Icon(Icons.directions),
             ),
-          )
+          ),
+          // Card de Iniciar Navegação quando rota estiver calculada
+          Positioned(
+            bottom: 20,
+            left: 20,
+            right: 90,
+            child: Obx(() {
+              if (!controller.isRouteCalculated.value) return const SizedBox.shrink();
+
+              return ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.greenAccent.shade700,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  elevation: 6,
+                ),
+                icon: const Icon(Icons.navigation, size: 26),
+                label: const Text(
+                  'INICIAR',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 1),
+                ),
+                onPressed: () {
+                  Get.toNamed(
+                    AppRoutes.navigation,
+                    arguments: controller.routePoints.toList(),
+                  );
+                },
+              );
+            }),
+          ),
         ],
       ),
     );
