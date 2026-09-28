@@ -13,20 +13,40 @@ class MapView extends GetView<MapController> {
       appBar: AppBar(title: const Text('Go - Navegação Offline')),
       body: Stack(
         children: [
-          FlutterMap(
+          Obx(() => FlutterMap(
             options: MapOptions(
               initialCenter: LatLng(controller.initialLat, controller.initialLon),
-              initialZoom: 4.0,
+              initialZoom: 16.0, // Zoom próximo para enxergar as ruas simuladas
             ),
             children: [
               TileLayer(
-                // Temporário: mapa via internet. 
-                // Futuro: MbTilesTileProvider() local
                 urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 userAgentPackageName: 'com.example.go',
               ),
+              PolylineLayer(
+                polylines: [
+                  Polyline(
+                    points: controller.routePoints.toList(),
+                    color: Colors.blueAccent,
+                    strokeWidth: 6.0,
+                  )
+                ],
+              ),
+              MarkerLayer(
+                markers: controller.routePoints.map((point) => Marker(
+                  point: point,
+                  width: 15,
+                  height: 15,
+                  child: const DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                )).toList(),
+              )
             ],
-          ),
+          )),
           Positioned(
             bottom: 20,
             right: 20,
