@@ -11,7 +11,34 @@ class MapView extends GetView<MapController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Go - Navegação Offline')),
+      appBar: AppBar(
+        title: const Text('Go - Navegação Offline'),
+        actions: [
+          Obx(() => Container(
+            margin: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: controller.isOfflineMapActive.value ? Colors.green.shade800 : Colors.blueGrey.shade800,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  controller.isOfflineMapActive.value ? Icons.offline_pin : Icons.cloud_outlined,
+                  size: 16,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  controller.isOfflineMapActive.value ? 'OFFLINE' : 'ONLINE',
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          )),
+        ],
+      ),
       body: Stack(
         children: [
           FlutterMap(
@@ -20,10 +47,17 @@ class MapView extends GetView<MapController> {
               initialZoom: 16.0,
             ),
             children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.go',
-              ),
+              Obx(() {
+                if (controller.isOfflineMapActive.value && controller.offlineTileProvider != null) {
+                  return TileLayer(
+                    tileProvider: controller.offlineTileProvider!,
+                  );
+                }
+                return TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.example.go',
+                );
+              }),
               Obx(() => PolylineLayer(
                 polylines: [
                   if (controller.routePoints.isNotEmpty)

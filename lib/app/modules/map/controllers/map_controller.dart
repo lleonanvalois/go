@@ -1,20 +1,35 @@
 import 'package:get/get.dart' hide Node;
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_map_mbtiles/flutter_map_mbtiles.dart';
 import 'package:go/app/data/providers/database_provider.dart';
 import 'package:go/app/data/services/offline_routing_service.dart';
+import 'package:go/app/data/services/offline_map_service.dart';
 
 class MapController extends GetxController {
   final double initialLat = -15.793889;
   final double initialLon = -47.882778;
 
   final isRouteCalculated = false.obs;
+  final isOfflineMapActive = false.obs;
   
   // Lista de pontos reativa que vai desenhar a linha da rota no mapa
   final routePoints = <LatLng>[].obs;
 
+  final OfflineMapService offlineMapService = OfflineMapService();
+  MbTilesTileProvider? get offlineTileProvider => offlineMapService.tileProvider;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _checkOfflineMap();
+  }
+
+  Future<void> _checkOfflineMap() async {
+    final available = await offlineMapService.initOfflineMap();
+    isOfflineMapActive.value = available;
+  }
+
   Future<void> calculateOfflineRoute() async {
-    print("Iniciando cálculo de rota via SQLite -> Isolate -> A*");
-    
     // 1. Busca os dados no Banco Local
     final nodesData = await DatabaseProvider.getNodes();
     final edgesData = await DatabaseProvider.getEdges();
@@ -38,6 +53,11 @@ class MapController extends GetxController {
 
     routePoints.value = newRoute;
     isRouteCalculated.value = true;
-    print("Caminho encontrado: $pathNodeIds");
+  }
+
+  @override
+  void onClose() {
+    offlineMapService.dispose();
+    super.onClose();
   }
 }
