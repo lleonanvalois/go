@@ -17,12 +17,13 @@ class DownloadMapsView extends GetView<DownloadMapsController> {
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
-      body: Obx(() {
-        return ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          itemCount: controller.regions.length,
-          itemBuilder: (context, index) {
-            final region = controller.regions[index];
+      body: ListView.builder(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        itemCount: controller.regions.length,
+        itemBuilder: (context, index) {
+          final region = controller.regions[index];
+
+          return Obx(() {
             final isDownloaded = controller.downloadedMap[region.id] ?? false;
             final isDownloading = controller.downloadingMap[region.id] ?? false;
             final progress = controller.downloadProgress[region.id] ?? 0.0;
@@ -137,9 +138,9 @@ class DownloadMapsView extends GetView<DownloadMapsController> {
                 ),
               ),
             );
-          },
-        );
-      }),
+          });
+        },
+      ),
     );
   }
 }
