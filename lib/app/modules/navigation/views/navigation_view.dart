@@ -201,7 +201,40 @@ class NavigationView extends GetView<NavigationController> {
                 color: Colors.white70,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
+            if (controller.isSpeeding.value) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.redAccent.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.redAccent, width: 2),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.redAccent,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'REDUZA! LIMITE ${controller.currentSpeedLimit.value} KM/H',
+                      style: const TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -209,19 +242,25 @@ class NavigationView extends GetView<NavigationController> {
               children: [
                 Text(
                   '${controller.currentSpeed.value}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 90,
                     fontWeight: FontWeight.w900,
-                    color: Colors.cyanAccent,
+                    color:
+                        controller.isSpeeding.value
+                            ? Colors.redAccent
+                            : Colors.cyanAccent,
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Text(
+                Text(
                   'KM/H',
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Colors.cyanAccent,
+                    color:
+                        controller.isSpeeding.value
+                            ? Colors.redAccent
+                            : Colors.cyanAccent,
                   ),
                 ),
               ],
@@ -280,36 +319,116 @@ class NavigationView extends GetView<NavigationController> {
   }
 
   Widget _buildSpeedometerBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.85),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: Colors.cyanAccent.withValues(alpha: 0.5),
-          width: 2,
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            '${controller.currentSpeed.value}',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 36,
-              fontWeight: FontWeight.w900,
+    final speeding = controller.isSpeeding.value;
+    final currentSpeed = controller.currentSpeed.value;
+    final speedLimit = controller.currentSpeedLimit.value;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        _buildSpeedLimitSign(speedLimit),
+        const SizedBox(width: 10),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color:
+                speeding
+                    ? const Color(0xFF4A0000).withValues(alpha: 0.9)
+                    : Colors.black.withValues(alpha: 0.85),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color:
+                  speeding
+                      ? Colors.redAccent
+                      : Colors.cyanAccent.withValues(alpha: 0.5),
+              width: speeding ? 3 : 2,
             ),
+            boxShadow:
+                speeding
+                    ? [
+                      BoxShadow(
+                        color: Colors.redAccent.withValues(alpha: 0.5),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                    : null,
           ),
-          const Text(
-            'KM/H',
-            style: TextStyle(
-              color: Colors.cyanAccent,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (speeding) ...[
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: Colors.redAccent,
+                      size: 16,
+                    ),
+                    SizedBox(width: 4),
+                    Text(
+                      'LIMITE!',
+                      style: TextStyle(
+                        color: Colors.redAccent,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+              ],
+              Text(
+                '$currentSpeed',
+                style: TextStyle(
+                  color: speeding ? Colors.redAccent : Colors.white,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+              Text(
+                'KM/H',
+                style: TextStyle(
+                  color: speeding ? Colors.redAccent : Colors.cyanAccent,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Placa regulamentar brasileira de limite de velocidade (R-19)
+  Widget _buildSpeedLimitSign(int limit) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        border: Border.all(color: const Color(0xFFD32F2F), width: 5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.5),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
           ),
         ],
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        '$limit',
+        style: const TextStyle(
+          color: Colors.black,
+          fontSize: 20,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -1,
+        ),
       ),
     );
   }

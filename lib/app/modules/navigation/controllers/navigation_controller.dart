@@ -14,6 +14,9 @@ class NavigationController extends GetxController {
   final isHudMode = false.obs;
   final isVoiceMuted = false.obs;
   final currentSpeed = 0.obs; // km/h
+  final currentSpeedLimit = 60.obs; // km/h regulamentar
+  final isSpeeding = false.obs;
+  DateTime? _lastSpeedAlertTime;
   final nextInstruction = 'Siga em frente'.obs;
   final distanceToNext = '150 m'.obs;
   final nextManeuverIcon = Rx<IconData>(Icons.straight);
@@ -106,6 +109,21 @@ class NavigationController extends GetxController {
           final speedKmH = (position.speed * 3.6).clamp(0, 300).round();
           currentSpeed.value = speedKmH;
           currentBearing.value = position.heading;
+
+          // Verificação de excesso de velocidade contra o limite da via
+          final speeding = speedKmH > currentSpeedLimit.value;
+          isSpeeding.value = speeding;
+
+          if (speeding) {
+            final now = DateTime.now();
+            if (_lastSpeedAlertTime == null ||
+                now.difference(_lastSpeedAlertTime!).inSeconds >= 20) {
+              _lastSpeedAlertTime = now;
+              _speak(
+                "Atenção: velocidade acima do limite de ${currentSpeedLimit.value} por hora.",
+              );
+            }
+          }
 
           // Se a câmera estiver travada no carro, move e rotaciona o mapa
           if (isCameraLocked.value) {
