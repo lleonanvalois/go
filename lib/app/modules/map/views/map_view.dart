@@ -14,6 +14,11 @@ class MapView extends GetView<MapController> {
       appBar: AppBar(
         title: const Text('Go - Navegação Offline'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.download_for_offline_outlined),
+            tooltip: 'Baixar Mapas Offline',
+            onPressed: () => Get.toNamed(AppRoutes.downloadMaps),
+          ),
           Obx(() => Container(
             margin: const EdgeInsets.only(right: 16),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
