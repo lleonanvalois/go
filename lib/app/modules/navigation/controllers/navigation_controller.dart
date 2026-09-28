@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:get/get.dart' hide Node;
 import 'package:latlong2/latlong.dart';
@@ -16,6 +17,10 @@ class NavigationController extends GetxController {
   final nextInstruction = 'Siga em frente'.obs;
   final distanceToNext = '150 m'.obs;
   final nextManeuverIcon = Rx<IconData>(Icons.straight);
+
+  // Câmera dinâmica centralizada
+  final fm.MapController mapController = fm.MapController();
+  final isCameraLocked = true.obs;
 
   // Posição atual do veículo e rota
   final currentPosition = Rxn<LatLng>();
@@ -101,6 +106,12 @@ class NavigationController extends GetxController {
           final speedKmH = (position.speed * 3.6).clamp(0, 300).round();
           currentSpeed.value = speedKmH;
           currentBearing.value = position.heading;
+
+          // Se a câmera estiver travada no carro, move e rotaciona o mapa
+          if (isCameraLocked.value) {
+            mapController.move(latLng, 17.5);
+            mapController.rotate(position.heading);
+          }
 
           _updateManeuverGuidance(latLng);
         });
@@ -274,12 +285,21 @@ class NavigationController extends GetxController {
     }
   }
 
+  void recenterCamera() {
+    isCameraLocked.value = true;
+    if (currentPosition.value != null) {
+      mapController.move(currentPosition.value!, 17.5);
+      mapController.rotate(currentBearing.value);
+    }
+  }
+
   void toggleHud() {
     isHudMode.value = !isHudMode.value;
   }
 
   @override
   void onClose() {
+    mapController.dispose();
     _flutterTts.stop();
     _positionSubscription?.cancel();
     WakelockPlus.disable();

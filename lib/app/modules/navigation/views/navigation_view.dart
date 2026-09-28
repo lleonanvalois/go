@@ -86,6 +86,7 @@ class NavigationView extends GetView<NavigationController> {
           child: Stack(
             children: [
               FlutterMap(
+                mapController: controller.mapController,
                 options: MapOptions(
                   initialCenter:
                       controller.currentPosition.value ??
@@ -94,6 +95,11 @@ class NavigationView extends GetView<NavigationController> {
                           : const LatLng(-15.793889, -47.882778)),
                   initialZoom: 17.5,
                   initialRotation: controller.currentBearing.value,
+                  onPositionChanged: (camera, hasGesture) {
+                    if (hasGesture) {
+                      controller.isCameraLocked.value = false;
+                    }
+                  },
                 ),
                 children: [
                   TileLayer(
@@ -136,6 +142,25 @@ class NavigationView extends GetView<NavigationController> {
 
               // Velocímetro flutuante sobre o mapa
               Positioned(bottom: 20, left: 20, child: _buildSpeedometerBadge()),
+
+              // Botão flutuante para recentralizar câmera
+              Obx(() {
+                if (controller.isCameraLocked.value) {
+                  return const SizedBox.shrink();
+                }
+                return Positioned(
+                  bottom: 20,
+                  right: 20,
+                  child: FloatingActionButton.extended(
+                    heroTag: 'recenter_nav_btn',
+                    backgroundColor: Colors.blueAccent,
+                    foregroundColor: Colors.white,
+                    icon: const Icon(Icons.my_location),
+                    label: const Text('Recentralizar'),
+                    onPressed: controller.recenterCamera,
+                  ),
+                );
+              }),
             ],
           ),
         ),
